@@ -8,7 +8,7 @@ var gulp = require('gulp');
 
 // ========== CONFIG ==========
 var webRoot = './www';
-var themeDir = webRoot + 'sites/all/themes/mytheme';
+var themeDir = webRoot + '/sites/all/themes/mytheme';
 
 var sassSrcDir = themeDir + '/assets/sass';
 var sassDestDir = themeDir + '/css';
