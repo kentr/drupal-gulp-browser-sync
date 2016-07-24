@@ -1,5 +1,5 @@
 /**
- * Gulpfile for using browser-sync reload server with Drupal development.
+ * Gulpfile for using browser-sync reload server with Drupal 8 development.
  *
  * @author Kent Richards
  */
@@ -7,36 +7,43 @@
 var gulp = require('gulp');
 
 // ========== CONFIG ==========
-var webRoot = './www';
-var themeDir = webRoot + '/sites/all/themes/mytheme';
+var webRoot = './web';
+var siteDir = webRoot + '/sites/default';
+var themeDir = webRoot + '/themes/kentrichards';
 
 var sassSrcDir = themeDir + '/assets/sass';
 var sassDestDir = themeDir + '/css';
 
-// TCP host:port that the backend server (Apache, Nginx..) is listening on.
-var reloadBackend = '127.0.0.1:8081';
-
-// TCP port used for main web connection.
-var reloadFrontendPort = 8080;
-
-// Globs that reload server should watch for changes.
-// @see https://github.com/isaacs/node-glob.
-var reloadWatchGlobs = [
-
-  ];
-
-// Globs for files that require a <code>drush cr</code> when changed.
-var crWatchGlobs = [
-  themeDir + '/**/*.yml',
-  themeDir + '/**/*.theme'
+// Patterns that Sass should watch for reprocessing.
+// Glob pattern documentation: https://github.com/isaacs/node-glob.
+var sassWatchPatterns = [
+  sassSrcDir + '/**.scss'
 ];
 
+// Host:port that the backend server (Apache, Nginx..) is listening on.
+var reloadBackend = 'localhost:8081';
 
+// Port used for main web connection.
+var reloadFrontendPort = 8080;
 
+// Patterns that reload server should watch for changes.
 
+// Note: Any stylesheet compiled by Sass shouldn't need to be watched here
+// because they should be injected into the HTML automatically by the
+// 'sass' task.
+var reloadWatchPatterns = [
+  themeDir + '/**/*.@(png|jpe?g|gif|ico|svg|tiff)'
+];
+
+// Patterns for files that require a <code>drush cr</code> when changed.
+var crWatchPatterns = [
+  siteDir + '/**/*.yml',
+  themeDir + '/**/*.yml',
+  themeDir + '/**/*.theme',
+  themeDir + '/templates/**/*.*'
+];
 
 // ========== SASS ==========
-
 var sass = require('gulp-sass');
 
 gulp.task('sass', function () {
@@ -47,11 +54,10 @@ gulp.task('sass', function () {
 });
 
 gulp.task('sass:watch', ['sass'], function () {
-  gulp.watch(sassSrcDir + '/**.scss', ['sass']);
+  gulp.watch(sassWatchPatterns, ['sass']);
 });
 
 // ========== BROWSER-SYNC / RELOAD ==========
-
 var browserSync = require('browser-sync');
 var reload  = browserSync.reload;
 
@@ -64,7 +70,7 @@ gulp.task('browser-sync', function() {
     });
 });
 
-
+// ========== DRUSH CACHE RESET ==========
 var run = require('gulp-run');
 
 gulp.task('cr', function() {
@@ -73,9 +79,8 @@ gulp.task('cr', function() {
 });
 
 
-// ========== DEFAULT ==========
-
-gulp.task('default', ['browser-sync', 'sass:watch'], function () {
-    gulp.watch(reloadWatchGlobs, [reload]);
-    gulp.watch(crWatchGlobs, ['cr', reload]);
+// ========== MAIN WATCH ==========
+gulp.task('watch', ['browser-sync', 'sass:watch'], function () {
+    gulp.watch(reloadWatchPatterns, reload);
+    gulp.watch(crWatchPatterns, ['cr', reload]);
 });
