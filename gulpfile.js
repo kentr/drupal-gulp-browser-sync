@@ -9,7 +9,7 @@ var gulp = require('gulp');
 // ========== CONFIG ==========
 var webRoot = './web';
 var siteDir = webRoot + '/sites/default';
-var themeDir = webRoot + '/themes/kentrichards';
+var themeDir = webRoot + '/themes/mytheme';
 
 var sassSrcDir = themeDir + '/assets/sass';
 var sassDestDir = themeDir + '/css';
